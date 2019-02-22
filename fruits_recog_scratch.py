@@ -21,7 +21,7 @@ import numpy as np
 start_t = timer()
 
 
-declare the paths of downloaded folder; Training, Validation and Test folder
+# declare the paths of downloaded folder; Training, Validation and Test folder
 training_dir = '/Users/bathuy/Downloads/fruits-360/Training'
 validation_dir = '/Users/bathuy/Downloads/fruits-360/Validation'
 test_dir = '/U`sers/bathuy/Downloads/fruits-360/Test'
