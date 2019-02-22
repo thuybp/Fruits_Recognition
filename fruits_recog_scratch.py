@@ -22,9 +22,12 @@ start_t = timer()
 
 
 # declare the paths of downloaded folder; Training, Validation and Test folder
-training_dir = '/Users/bathuy/Downloads/fruits-360/Training'
-validation_dir = '/Users/bathuy/Downloads/fruits-360/Validation'
-test_dir = '/Users/bathuy/Downloads/fruits-360/Test'
+#training_dir = '/Users/bathuy/Downloads/fruits-360/Training'
+#validation_dir = '/Users/bathuy/Downloads/fruits-360/Validation'
+#test_dir = '/U`sers/bathuy/Downloads/fruits-360/Test'
+training_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset/Training'
+validation_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset/Validation'
+test_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset/Test'
 
 # define the parameters
 saved_path = os.path.join(os.getcwd(), 'saved_models')
@@ -91,7 +94,7 @@ test_datagen = ImageDataGenerator(rescale=1./255)
 
 
 # train the model
-num_epochs = 1
+num_epochs = 50
 batch_size = 32
 
 # define data generator for training set and validation set
