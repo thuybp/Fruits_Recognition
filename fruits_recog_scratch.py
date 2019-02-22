@@ -32,7 +32,7 @@ try:
     os.mkdir(saved_path)
 except:
     pass
-    
+
 model_name = 'CNN_scratch.h5'
 model_name_aug = 'CNN_scratch_aug.h5'
 model_weights = 'CNN_scratch_weights.h5'
