@@ -21,10 +21,13 @@ import numpy as np
 start_t = timer()
 
 
-# declare the paths of downloaded folder; Training, Validation and Test folder
+declare the paths of downloaded folder; Training, Validation and Test folder
 training_dir = '/Users/bathuy/Downloads/fruits-360/Training'
 validation_dir = '/Users/bathuy/Downloads/fruits-360/Validation'
-test_dir = '/Users/bathuy/Downloads/fruits-360/Test'
+test_dir = '/U`sers/bathuy/Downloads/fruits-360/Test'
+# training_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset/Training'
+# validation_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset/Validation'
+# test_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset/Test'
 
 # define the parameters
 saved_path = os.path.join(os.getcwd(), 'saved_models')
@@ -91,7 +94,7 @@ test_datagen = ImageDataGenerator(rescale=1./255)
 
 
 # train the model
-num_epochs = 1
+num_epochs = 50
 batch_size = 32
 
 # define data generator for training set and validation set
@@ -106,7 +109,7 @@ history = model.fit_generator(train_generator,
 
 if data_augmentation:
     model.save(os.path.join(saved_path, model_name_aug))
-    model.save_weights(os.path.join(saved_path, model_weights_data_aug))
+    model.save_weights(os.path.join(saved_path, model_weights))
 else:
     model.save(os.path.join(saved_path, model_name))
     model.save_weights(os.path.join(saved_path, model_weights_data_aug))
@@ -135,7 +138,7 @@ plt.plot(epochs, val_acc)
 plt.title('Training and validation accuracy')
 plt.ylabel('Accuracy')
 plt.xlabel('Epochs')
-plt.legend(['train', 'test'], loc='upper left')
+plt.legend(['train', 'test'], loc='lower right')
 plt.savefig(os.path.join(saved_path, 'train_test_accuracy.png'))
 plt.clf()  # clear figure
 # summarize history for loss (binary cross-entropy)
@@ -144,7 +147,7 @@ plt.plot(epochs, val_loss)
 plt.title(('Training and validation loss'))
 plt.ylabel('Loss')
 plt.xlabel('Epochs')
-plt.legend(['train', 'test'], loc='upper left')
+plt.legend(['train', 'test'], loc='upper right')
 plt.savefig(os.path.join(saved_path, 'train_test_loss.png'))
 plt.clf()
 
