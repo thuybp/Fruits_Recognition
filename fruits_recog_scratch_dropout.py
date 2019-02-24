@@ -134,7 +134,7 @@ plt.plot(epochs, val_acc)
 plt.title('Training and validation accuracy')
 plt.ylabel('Accuracy')
 plt.xlabel('Epochs')
-plt.legend(['train', 'test'], loc='upper left')
+plt.legend(['train', 'test'], loc='lower right')
 plt.savefig(os.path.join(saved_path, 'train_test_accuracy_dropout.png'))
 plt.clf()  # clear figure
 
@@ -143,7 +143,7 @@ plt.plot(epochs, val_loss)
 plt.title(('Training and validation loss'))
 plt.ylabel('Loss')
 plt.xlabel('Epochs')
-plt.legend(['train', 'test'], loc='upper left')
+plt.legend(['train', 'test'], loc='upper right')
 plt.savefig(os.path.join(saved_path, 'train_test_loss_dropout.png'))
 plt.clf()
 
