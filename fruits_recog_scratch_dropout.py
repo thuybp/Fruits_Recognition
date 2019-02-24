@@ -25,6 +25,9 @@ start_t = timer()
 training_dir = '/Users/bathuy/Downloads/fruits-360/Training'
 validation_dir = '/Users/bathuy/Downloads/fruits-360/Validation'
 test_dir = '/Users/bathuy/Downloads/fruits-360/Test'
+# training_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset/Training'
+# validation_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset/Validation'
+# test_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset/Test'
 
 # define the parameters
 saved_path = os.path.join(os.getcwd(), 'saved_models')
@@ -34,7 +37,7 @@ except:
     pass
     
 model_name = 'CNN_scratch_dropout.h5'
-model_name_aug = 'CNN_scratch_aug_dropout.h5'
+model_name_aug = 'CNN_scratch_dropout_aug.h5'
 model_weights = 'CNN_scratch_dropout_weights.h5'
 model_weights_data_aug = 'CNN_scratch_aug_dropout_weights.h5'
 num_classes = 95
@@ -109,7 +112,7 @@ if data_augmentation:
     model.save_weights(os.path.join(saved_path, model_weights_data_aug))
 else:
     model.save(os.path.join(saved_path, model_name))
-    model.save_weights(os.path.join(saved_path, model_weights_data_aug))
+    model.save_weights(os.path.join(saved_path, model_weights_aug))
 
 # --------display history--------
 # list all data in history

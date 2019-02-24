@@ -109,10 +109,10 @@ history = model.fit_generator(train_generator,
 
 if data_augmentation:
     model.save(os.path.join(saved_path, model_name_aug))
-    model.save_weights(os.path.join(saved_path, model_weights))
+    model.save_weights(os.path.join(saved_path, model_weights_data_aug))
 else:
     model.save(os.path.join(saved_path, model_name))
-    model.save_weights(os.path.join(saved_path, model_weights_data_aug))
+    model.save_weights(os.path.join(saved_path, model_weights))
 
 # --------display history--------
 # list all data in history
