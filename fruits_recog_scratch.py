@@ -37,7 +37,7 @@ except:
     pass
 
 model_name = 'CNN_scratch.h5'
-model_name_aug = 'CNN_scratch_aug.h5'
+model_name_data_aug = 'CNN_scratch_aug.h5'
 model_weights = 'CNN_scratch_weights.h5'
 model_weights_data_aug = 'CNN_scratch_aug_weights.h5'
 num_classes = 95
@@ -108,7 +108,7 @@ history = model.fit_generator(train_generator,
                             validation_steps=8205//batch_size)
 
 if data_augmentation:
-    model.save(os.path.join(saved_path, model_name_aug))
+    model.save(os.path.join(saved_path, model_name_data_aug))
     model.save_weights(os.path.join(saved_path, model_weights_data_aug))
 else:
     model.save(os.path.join(saved_path, model_name))

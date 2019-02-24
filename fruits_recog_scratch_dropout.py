@@ -112,7 +112,7 @@ if data_augmentation:
     model.save_weights(os.path.join(saved_path, model_weights_data_aug))
 else:
     model.save(os.path.join(saved_path, model_name))
-    model.save_weights(os.path.join(saved_path, model_weights_aug))
+    model.save_weights(os.path.join(saved_path, model_weights))
 
 # --------display history--------
 # list all data in history
