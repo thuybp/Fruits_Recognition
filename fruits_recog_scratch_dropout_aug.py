@@ -38,10 +38,10 @@ except:
     
 model_name = 'CNN_scratch_dropout.h5'
 model_name_aug = 'CNN_scratch_dropout_aug.h5'
-model_weights = 'CNN_scratch_dropout_weights.h5'
-model_weights_data_aug = 'CNN_scratch_aug_dropout_weights.h5'
+model_weights = 'CNN_scratch_dropout_aug_weights.h5'
+model_weights_data_aug = 'CNN_scratch_aug_dropout_aug_weights.h5'
 num_classes = 95
-data_augmentation = False
+data_augmentation = True
 
 #--------------------------------------------------------------------------
 # define the training model
@@ -81,11 +81,10 @@ model.summary()
 if data_augmentation:
     train_datagen = ImageDataGenerator(
         rescale=1./255,
-        # rotation_range=40,
+        rotation_range=40,
         width_shift_range=0.1,
         height_shift_range=0.1,
-        # shear_range=0.2,
-        # zoom_range=0.2,
+        zoom_range=0.1,
         horizontal_flip=True, 
     )
 else:
@@ -94,7 +93,7 @@ test_datagen = ImageDataGenerator(rescale=1./255)
 
 
 # train the model
-num_epochs = 1
+num_epochs = 25
 batch_size = 32
 
 # define data generator for training set and validation set
@@ -119,7 +118,8 @@ else:
 print(history.history.keys())
 
 test_loss, test_acc = model.evaluate_generator(test_generator, steps=8216//batch_size)
-print('Test accuracy = ', test_acc)
+print('Test accuracy = {:.4f}'.format(test_acc))
+print('Test loss = {:.4f}'.format(test_loss))
 
 # summarize history for accuracy
 acc = history.history['acc']
@@ -135,7 +135,7 @@ plt.title('Training and validation accuracy')
 plt.ylabel('Accuracy')
 plt.xlabel('Epochs')
 plt.legend(['train', 'test'], loc='lower right')
-plt.savefig(os.path.join(saved_path, 'train_test_accuracy_dropout.png'))
+plt.savefig(os.path.join(saved_path, 'train_test_accuracy_dropout_aug.png'))
 plt.clf()  # clear figure
 
 plt.plot(epochs, loss)
@@ -144,7 +144,7 @@ plt.title(('Training and validation loss'))
 plt.ylabel('Loss')
 plt.xlabel('Epochs')
 plt.legend(['train', 'test'], loc='upper right')
-plt.savefig(os.path.join(saved_path, 'train_test_loss_dropout.png'))
+plt.savefig(os.path.join(saved_path, 'train_test_loss_dropout_aug.png'))
 plt.clf()
 
 stop_t = timer()
