@@ -2,6 +2,7 @@ import os, shutil
 
 # declare the paths of downloaded folder; Training, Validation and Test folder
 downloaded_dir = '/Users/bathuy/Downloads/fruits-360'
+# downloaded_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset'
 valid_dir = os.path.join(downloaded_dir, 'Validation')
 training_dir = os.path.join(downloaded_dir, 'Training')
 test_dir = os.path.join(downloaded_dir, 'Test')
