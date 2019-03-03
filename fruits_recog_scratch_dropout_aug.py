@@ -39,7 +39,7 @@ except:
 model_name = 'CNN_scratch_dropout.h5'
 model_name_aug = 'CNN_scratch_dropout_aug.h5'
 model_weights = 'CNN_scratch_dropout_aug_weights.h5'
-model_weights_data_aug = 'CNN_scratch_aug_dropout_aug_weights.h5'
+model_weights_data_aug = 'CNN_scratch_dropout_aug_weights.h5'
 num_classes = 95
 data_augmentation = True
 
