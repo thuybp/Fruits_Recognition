@@ -98,8 +98,11 @@ num_epochs = 50
 batch_size = 32
 
 # define data generator for training set and validation set
+print("Training set:")
 train_generator = train_datagen.flow_from_directory(training_dir, batch_size=batch_size, target_size=(100,100))
+print("Validation set:")
 validation_generator = test_datagen.flow_from_directory(validation_dir, batch_size=batch_size, target_size=(100, 100))
+print("Test set:")
 test_generator = test_datagen.flow_from_directory(test_dir, batch_size=batch_size, target_size=(100,100))
 
 history = model.fit_generator(train_generator,
@@ -123,7 +126,8 @@ print(history.history.keys())
 # print('Test loss:', scores[0])
 # print('Test accuracy:', scores[1])
 test_loss, test_acc = model.evaluate_generator(test_generator, steps=8216//batch_size)
-print('Test accuracy = ', test_acc)
+print('Test accuracy = {:.4f}'.format(test_acc))
+print('Test loss = {:.4f}'.format(test_loss))
 
 # summarize history for accuracy
 acc = history.history['acc']
