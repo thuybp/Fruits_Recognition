@@ -11,7 +11,7 @@ from keras.utils import np_utils
 
 from keras.preprocessing.image import ImageDataGenerator
 
-from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLRonPlateau
+from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 
 from sklearn.model_selection import train_test_split
 
@@ -27,9 +27,9 @@ start_t = timer()
 training_dir = '/Users/bathuy/Downloads/fruits-360/Training'
 validation_dir = '/Users/bathuy/Downloads/fruits-360/Validation'
 test_dir = '/Users/bathuy/Downloads/fruits-360/Test'
-# training_dir = '/home/nhaclap_phan/DeepLearning/Fruits-360/Training'
-# validation_dir = '/home/nhaclap_phan/DeepLearning/Fruits-360/Validation'
-# test_dir = '/home/nhaclap_phan/DeepLearning/Fruits-360/Test'
+# training_dir = '/home/nhaclap_phan/DeepLearning/fruits-360/Training'
+# validation_dir = '/home/nhaclap_phan/DeepLearning/fruits-360/Validation'
+# test_dir = '/home/nhaclap_phan/DeepLearning/fruits-360/Test'
 
 # define the parameters
 saved_path = os.path.join(os.getcwd(), 'saved_models')
@@ -49,10 +49,9 @@ data_augmentation = True
 
 # define callbacks list
 callbacks_list = [
-    keras.callbacks.EarlyStopping(monitor='acc', patience=10)
-    keras.callbacks.ModelCheckpoint(
-        filepath='callbacks_model.h5', monitor='val_loss', save_best_only=True)
-    keras.callbacks.ReduceLROnPlateau(monitor'val_loss', factor=0.5, patience=5)
+    keras.callbacks.EarlyStopping(monitor='acc', patience=10),
+    keras.callbacks.ModelCheckpoint(filepath='callbacks_model.h5', monitor='val_loss', save_best_only=True),
+    keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5),
 ]
 # define the training model
 model = Sequential()
