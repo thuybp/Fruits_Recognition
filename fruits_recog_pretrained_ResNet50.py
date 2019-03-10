@@ -96,7 +96,7 @@ test_datagen = ImageDataGenerator(rescale=1./255)
 
 batch_size = 128
 # train the model
-num_epochs = 50
+num_epochs = 1
 
 # define data generator for training set and validation set
 print("Training set:")
