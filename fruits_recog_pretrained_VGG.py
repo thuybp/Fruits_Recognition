@@ -11,6 +11,8 @@ from keras.applications import VGG16
 
 from keras.preprocessing.image import ImageDataGenerator
 
+from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+
 from sklearn.model_selection import train_test_split
 
 import os, os.path
@@ -24,9 +26,12 @@ start_t = timer()
 
 
 # declare the paths of downloaded folder; Training, Validation and Test folder
-training_dir = '/Users/bathuy/Downloads/fruits-360/Training'
-validation_dir = '/Users/bathuy/Downloads/fruits-360/Validation'
-test_dir = '/Users/bathuy/Downloads/fruits-360/Test'
+# training_dir = '/Users/bathuy/Downloads/fruits-360/Training'
+# validation_dir = '/Users/bathuy/Downloads/fruits-360/Validation'
+# test_dir = '/Users/bathuy/Downloads/fruits-360/Test'
+training_dir = '/home/nhaclap_phan/DeepLearning/fruits-360/Training'
+validation_dir = '/home/nhaclap_phan/DeepLearning/fruits-360/Validation'
+test_dir = '/home/nhaclap_phan/DeepLearning/fruits-360/Test'
 
 # define the parameters
 saved_path = os.path.join(os.getcwd(), 'saved_models')
@@ -35,43 +40,27 @@ try:
 except:
     pass
     
+model_name_aug = 'CNN_pretrained_VGG_aug.h5'
+model_weights_data_aug = 'CNN_pretrained_VGG_aug_weights.h5'
 model_name = 'CNN_pretrained_VGG.h5'
-model_weights = 'CNN_scratch_pretrained_VGG_weights.h5'
+model_weights = 'CNN_pretrained_VGG_weights.h5'
 num_classes = 95
+data_augmentation = True
 
-
-datagen = ImageDataGenerator(rescale=1./255)
-batch_size = 32
-
-# define a function to extract features of the CNN_base outputs
-def extract_features(dir_path, samples):
-    feature_maps = np.zeros(shape=(samples, 3, 3, 512))
-    labels = np.zeros(shape=(samples))
-    generator = datagen.flow_from_directory(dir_path, 
-                            target_size=(100, 100), batch_size=batch_size)
-    i = 0
-    for images_batch, labels_batch in generator:
-        features_batch = CNN_base.predict(images_batch)
-        feature_maps[i*batch_size: (i+1)*batch_size] = features_batch
-        labels[i*batch_size : (i+1)*batch_size] = labels_batch
-        i += 1
-        if i*batch_size >= samples:
-            break
-    return feature_maps, labels
-
-# extract the outputs of VGG net for the inputs: training set, validation set and test set
-train_features, train_labels = extract_features(training_dir, 48905)
-validation_features, validation_labels = extract_features(validation_dir, 8205)
-test_features, test_labels = extract_features(test_dir, 8216)
-
-# reshape the features before feeding into the Dense layers
-train_features = np.reshape(train_features, (48905, 3, 3, 512))
-validation_features = np.reshape(validation_features, (8205, 3, 3, 512))
-test_features = np.reshape(test_features, (8216, 3, 3, 512))
+# define callbacks list
+callbacks_list = [
+    keras.callbacks.EarlyStopping(monitor='acc', patience=10),
+    keras.callbacks.ModelCheckpoint(
+        filepath='callbacks_model.h5', monitor='val_loss', save_best_only=True),
+    keras.callbacks.ReduceLROnPlateau(
+        monitor='val_loss', factor=0.5, patience=5),
+]
 #--------------------------------------------------------------------------
 # define the classifier
 model = Sequential()
-model.add(Dense(256))
+model.add(CNN_base)
+model.add(Flatten())
+model.add(Dense(1024))
 model.add(Activation('relu'))
 model.add(Dropout(0.25))
 model.add(Dense(95))
@@ -79,29 +68,83 @@ model.add(Activation('softmax'))
 
 opt = keras.optimizers.RMSprop(lr=0.0001)
 
-model.compile(loss='categorical_crossentropy', optimizer=opt ,metrics=['accuracy'])
-
-model.summary()
 #---------------------------------------------------------------------------------
+# define data generator
+if data_augmentation:
+    train_datagen = ImageDataGenerator(
+        rescale=1./255,
+        rotation_range=40,
+        width_shift_range=0.1,
+        height_shift_range=0.1,
+        zoom_range=0.1,
+        horizontal_flip=True,
+    )
+else:
+    train_datagen = ImageDataGenerator(rescale=1./255)
+test_datagen = ImageDataGenerator(rescale=1./255)
 
+
+batch_size = 128
 # train the model
-num_epochs = 1
+num_epochs = 50
 
+# define data generator for training set and validation set
+print("Training set:")
+train_generator = train_datagen.flow_from_directory(
+    training_dir, batch_size=batch_size, target_size=(100, 100))
+print("Validation set:")
+validation_generator = test_datagen.flow_from_directory(
+    validation_dir, batch_size=batch_size, target_size=(100, 100))
+print("Test set:")
+test_generator = test_datagen.flow_from_directory(
+    test_dir, batch_size=batch_size, target_size=(100, 100))
 
-history = model.fit(train_features,train_labels, epochs=num_epochs,
-                            validation_data=(validation_features, validation_labels),
-                            batch_size=batch_size)
+CNN_base.trainable = False
+model.summary()
 
+model.compile(loss='categorical_crossentropy',
+              optimizer=opt, metrics=['accuracy'])
+history = model.fit_generator(train_generator,
+                              steps_per_epoch=48905//batch_size, epochs=num_epochs,
+                              callbacks=callbacks_list,
+                              validation_data=validation_generator,
+                              validation_steps=8205//batch_size)
 
-model.save(os.path.join(saved_path, model_name))
-model.save_weights(os.path.join(saved_path, model_weights))
+# unfreeze the top layers of VGG and train the model again
+CNN_base.trainable = True
+
+train_layers = ['block4_conv1','block4_conv2','block4_conv3','block5_conv1','block5_conv2','block5_conv3']
+for layer in CNN_base.layers:
+    if layer in train_layers:
+        layer.trainable = True
+    else:
+        layer.trainable = False
+
+model.compile(loss='categorical_crossentropy',
+              optimizer=opt, metrics=['accuracy'])
+
+history = model.fit_generator(train_generator,
+                              steps_per_epoch=48905//batch_size, epochs=num_epochs,
+                              callbacks=callbacks_list,
+                              validation_data=validation_generator,
+                              validation_steps=8205//batch_size)
+#--------------------------------------------------------------------------------------
+# save the model
+if data_augmentation:
+    model.save(os.path.join(saved_path, model_name_aug))
+    model.save_weights(os.path.join(saved_path, model_weights_data_aug))
+else:
+    model.save(os.path.join(saved_path, model_name))
+    model.save_weights(os.path.join(saved_path, model_weights))
 
 # --------display history--------
 # list all data in history
 print(history.history.keys())
 
-test_loss, test_acc = model.evaluate(test_features, test_labels, steps=8205//batch_size, verbose=1)
-print('Test accuracy = ', test_acc)
+test_loss, test_acc = model.evaluate_generator(
+    test_generator, steps=8216//batch_size, verbose=1)
+print('Test accuracy = {:.4f}'.format(test_acc))
+print('Test loss = {:.4f}'.format(test_loss))
 
 # summarize history for accuracy
 acc = history.history['acc']
