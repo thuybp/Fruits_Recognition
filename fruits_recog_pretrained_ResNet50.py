@@ -146,7 +146,7 @@ train_layers = ['res5a_branch2a', 'bn5a_branch2a',
                 'res5c_branch2a', 'bn5c_branch2a', 'res5c_branch2b', 'bn5c_branch2b',
                 'res5c_branch2c', 'bn5c_branch2c', ]
 for layer in CNN_ResNet.layers:
-    if layer in train_layers:
+    if layer.name in train_layers:
         layer.trainable = True
     else:
         layer.trainable = False

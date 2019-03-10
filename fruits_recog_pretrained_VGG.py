@@ -115,7 +115,7 @@ CNN_base.trainable = True
 
 train_layers = ['block4_conv1','block4_conv2','block4_conv3','block5_conv1','block5_conv2','block5_conv3']
 for layer in CNN_base.layers:
-    if layer in train_layers:
+    if layer.name in train_layers:
         layer.trainable = True
     else:
         layer.trainable = False
