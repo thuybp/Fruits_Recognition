@@ -137,10 +137,12 @@ finetuning_model.add(Activation('softmax'))
 finetuning_model.load_weights(os.path.join(saved_path, model_weights_data_aug))
 # unfreeze the top layers of VGG and train the model again
 CNN_base.trainable = True
-
-train_layers = ['block4_conv1','block4_conv2','block4_conv3','block5_conv1','block5_conv2','block5_conv3']
+set_trainable = False
+# train_layers = ['block4_conv1','block4_conv2','block4_conv3','block5_conv1','block5_conv2','block5_conv3']
 for layer in CNN_base.layers:
-    if layer.name in train_layers:
+    if layer.name == 'block4_conv1':
+        set_trainable = True
+    if set_trainable:
         layer.trainable = True
     else:
         layer.trainable = False

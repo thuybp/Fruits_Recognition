@@ -54,6 +54,10 @@ model_name_aug = 'CNN_pretrained_ResNet50_aug.h5'
 model_weights_data_aug = 'CNN_pretrained_ResNet50_aug_weights.h5'
 model_name = 'CNN_pretrained_ResNet50.h5'
 model_weights = 'CNN_pretrained_ResNet50_weights.h5'
+fine_model_name_aug = 'CNN_fine_pretrained_ResNet50_aug.h5'
+fine_model_weights_data_aug = 'CNN_fine_pretrained_ResNet50_aug_weights.h5'
+fine_model_name = 'CNN_fine_pretrained_ResNet50.h5'
+fine_model_weights = 'CNN_fine_pretrained_ResNet50_weights.h5'
 num_classes = 95
 data_augmentation = True
 
@@ -120,33 +124,30 @@ history = model.fit_generator(train_generator,
                               validation_data=validation_generator,
                               validation_steps=8205//batch_size)
 
+# save the model
+if data_augmentation:
+    model.save(os.path.join(saved_path, model_name_aug))
+    model.save_weights(os.path.join(saved_path, model_weights_data_aug))
+else:
+    model.save(os.path.join(saved_path, model_name))
+    model.save_weights(os.path.join(saved_path, model_weights))
+
+# load the model
+model.load_model(os.path.join(saved_path, model_name_aug))
+model.load_weights(os.path.join(saved_path, model_weights_data_aug))
 # unfreeze the top layers of ResNet50 and train the model again
 CNN_ResNet.trainable = True
 
-# train_layers = ['res4a_branch2a', 'bn4a_branch2a','res4a_branch2b', 'bn4a_branch2b', 
-#                 'res4a_branch2c', 'res4a_branch1', 'bn4a_branch2c', 'bn4a_branch1', 
-#                 'res4b_branch2a', 'bn4b_branch2a', 'res4b_branch2b', 'bn4b_branch2b',
-#                 'res4b_branch2c', 'bn4b_branch2c', 'res4c_branch2a', 'bn4c_branch2a',
-#                 'res4c_branch2b', 'bn4c_branch2b', 'res4c_branch2c', 'bn4c_branch2c',
-#                 'res4d_branch2a', 'bn4d_branch2a', 'res4d_branch2b', 'bn4d_branch2b',
-#                 'res4d_branch2c', 'bn4d_branch2c', 'res4e_branch2a', 'bn4e_branch2a',
-#                 'res4e_branch2b', 'bn4e_branch2b', 'res4e_branch2c', 'bn4e_branch2c',
-#                 'res4f_branch2a', 'bn4f_branch2a', 'res4f_branch2b', 'bn4f_branch2b',
-#                 'res4f_branch2c', 'bn4f_branch2c', 'res5a_branch2a', 'bn5a_branch2a',
+# train_layers = ['res5a_branch2a', 'bn5a_branch2a',
 #                 'res5a_branch2b', 'bn5a_branch2b', 'res5a_branch2c', 'res5a_branch1',
 #                 'bn5a_branch2c', 'bn5a_branch1', 'res5b_branch2a', 'bn5b_branch2a',
 #                 'res5b_branch2b', 'bn5b_branch2b', 'res5b_branch2c', 'bn5b_branch2c',
 #                 'res5c_branch2a', 'bn5c_branch2a', 'res5c_branch2b', 'bn5c_branch2b',
-#                 'res5c_branch2c', 'bn5c_branch2c',]
-
-train_layers = ['res5a_branch2a', 'bn5a_branch2a',
-                'res5a_branch2b', 'bn5a_branch2b', 'res5a_branch2c', 'res5a_branch1',
-                'bn5a_branch2c', 'bn5a_branch1', 'res5b_branch2a', 'bn5b_branch2a',
-                'res5b_branch2b', 'bn5b_branch2b', 'res5b_branch2c', 'bn5b_branch2c',
-                'res5c_branch2a', 'bn5c_branch2a', 'res5c_branch2b', 'bn5c_branch2b',
-                'res5c_branch2c', 'bn5c_branch2c', ]
+#                 'res5c_branch2c', 'bn5c_branch2c', ]
 for layer in CNN_ResNet.layers:
-    if layer.name in train_layers:
+    if layer.name == 'activation_530':
+        set_trainable = True
+    if set_trainable:
         layer.trainable = True
     else:
         layer.trainable = False
@@ -163,11 +164,11 @@ history = model.fit_generator(train_generator,
 #--------------------------------------------------------------------------------------
 # save the model
 if data_augmentation:
-    model.save(os.path.join(saved_path, model_name_aug))
-    model.save_weights(os.path.join(saved_path, model_weights_data_aug))
+    model.save(os.path.join(saved_path, fine_model_name_aug))
+    model.save_weights(os.path.join(saved_path, fine_model_weights_data_aug))
 else:
-    model.save(os.path.join(saved_path, model_name))
-    model.save_weights(os.path.join(saved_path, model_weights))
+    model.save(os.path.join(saved_path, fine_model_name))
+    model.save_weights(os.path.join(saved_path, fine_model_weights))
 
 # --------display history--------
 # list all data in history
