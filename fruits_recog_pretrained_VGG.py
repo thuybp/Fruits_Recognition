@@ -44,6 +44,10 @@ model_name_aug = 'CNN_pretrained_VGG_aug.h5'
 model_weights_data_aug = 'CNN_pretrained_VGG_aug_weights.h5'
 model_name = 'CNN_pretrained_VGG.h5'
 model_weights = 'CNN_pretrained_VGG_weights.h5'
+finetuning_model_name_aug = 'CNN_finetuning_pretrained_VGG_aug.h5'
+finetuning_model_weights_data_aug = 'CNN_finetuning_pretrained_VGG_aug_weights.h5'
+finetuning_model_name = 'CNN_finetuning_pretrained_VGG.h5'
+finetuning_model_weights = 'CNN_finetuning_pretrained_VGG_weights.h5'
 num_classes = 95
 data_augmentation = True
 
@@ -110,6 +114,27 @@ history = model.fit_generator(train_generator,
                               validation_data=validation_generator,
                               validation_steps=8205//batch_size)
 
+# save the model
+if data_augmentation:
+    model.save(os.path.join(saved_path, model_name_aug))
+    model.save_weights(os.path.join(saved_path, model_weights_data_aug))
+else:
+    model.save(os.path.join(saved_path, model_name))
+    model.save_weights(os.path.join(saved_path, model_weights))
+
+
+# load the model
+# define the classifier
+finetuning_model = Sequential()
+finetuning_model.add(CNN_base)
+finetuning_model.add(Flatten())
+finetuning_model.add(Dense(1024))
+finetuning_model.add(Activation('relu'))
+finetuning_model.add(Dropout(0.25))
+finetuning_model.add(Dense(95))
+finetuning_model.add(Activation('softmax'))
+
+finetuning_model.load_weights(os.path.join(saved_path, model_weights_data_aug))
 # unfreeze the top layers of VGG and train the model again
 CNN_base.trainable = True
 
@@ -120,10 +145,10 @@ for layer in CNN_base.layers:
     else:
         layer.trainable = False
 
-model.compile(loss='categorical_crossentropy',
+finetuning_model.compile(loss='categorical_crossentropy',
               optimizer=opt, metrics=['accuracy'])
 
-history = model.fit_generator(train_generator,
+history = finetuning_model.fit_generator(train_generator,
                               steps_per_epoch=48905//batch_size, epochs=num_epochs,
                               callbacks=callbacks_list,
                               validation_data=validation_generator,
@@ -131,17 +156,19 @@ history = model.fit_generator(train_generator,
 #--------------------------------------------------------------------------------------
 # save the model
 if data_augmentation:
-    model.save(os.path.join(saved_path, model_name_aug))
-    model.save_weights(os.path.join(saved_path, model_weights_data_aug))
+    finetuning_model.save(os.path.join(saved_path, finetuning_model_name_aug))
+    finetuning_model.save_weights(
+        os.path.join(saved_path, finetuning_model_weights_data_aug))
 else:
-    model.save(os.path.join(saved_path, model_name))
-    model.save_weights(os.path.join(saved_path, model_weights))
+    finetuning_model.save(os.path.join(saved_path, finetuning_model_name))
+    finetuning_model.save_weights(os.path.join(
+        saved_path, finetuning_model_weights))
 
 # --------display history--------
 # list all data in history
 print(history.history.keys())
 
-test_loss, test_acc = model.evaluate_generator(
+test_loss, test_acc = finetuning_model.evaluate_generator(
     test_generator, steps=8216//batch_size, verbose=1)
 print('Test accuracy = {:.4f}'.format(test_acc))
 print('Test loss = {:.4f}'.format(test_loss))
