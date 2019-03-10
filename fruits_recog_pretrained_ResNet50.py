@@ -133,8 +133,8 @@ else:
     model.save_weights(os.path.join(saved_path, model_weights))
 
 # load the model
-model.load_model(os.path.join(saved_path, model_name_aug))
-model.load_weights(os.path.join(saved_path, model_weights_data_aug))
+fine_model = load_model(os.path.join(saved_path, model_name_aug))
+fine_model.load_weights(os.path.join(saved_path, model_weights_data_aug))
 # unfreeze the top layers of ResNet50 and train the model again
 CNN_ResNet.trainable = True
 set_trainable = False
@@ -152,11 +152,11 @@ for layer in CNN_ResNet.layers:
     else:
         layer.trainable = False
 
-model.summary()
-model.compile(loss='categorical_crossentropy',
+fine_model.summary()
+fine_model.compile(loss='categorical_crossentropy',
               optimizer=opt, metrics=['accuracy'])
 
-history = model.fit_generator(train_generator,
+history = fine_model.fit_generator(train_generator,
                               steps_per_epoch=48905//batch_size, epochs=num_epochs,
                               callbacks=callbacks_list,
                               validation_data=validation_generator,
@@ -164,17 +164,18 @@ history = model.fit_generator(train_generator,
 #--------------------------------------------------------------------------------------
 # save the model
 if data_augmentation:
-    model.save(os.path.join(saved_path, fine_model_name_aug))
-    model.save_weights(os.path.join(saved_path, fine_model_weights_data_aug))
+    fine_model.save(os.path.join(saved_path, fine_model_name_aug))
+    fine_model.save_weights(os.path.join(
+        saved_path, fine_model_weights_data_aug))
 else:
-    model.save(os.path.join(saved_path, fine_model_name))
-    model.save_weights(os.path.join(saved_path, fine_model_weights))
+    fine_model.save(os.path.join(saved_path, fine_model_name))
+    fine_model.save_weights(os.path.join(saved_path, fine_model_weights))
 
 # --------display history--------
 # list all data in history
 print(history.history.keys())
 
-test_loss, test_acc = model.evaluate_generator(
+test_loss, test_acc = fine_model.evaluate_generator(
     test_generator, steps=8216//batch_size, verbose=1)
 print('Test accuracy = {:.4f}'.format(test_acc))
 print('Test loss = {:.4f}'.format(test_loss))
