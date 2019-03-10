@@ -96,7 +96,7 @@ test_datagen = ImageDataGenerator(rescale=1./255)
 
 batch_size = 128
 # train the model
-num_epochs = 50
+num_epochs = 1
 
 # define data generator for training set and validation set
 print("Training set:")
@@ -123,13 +123,35 @@ history = model.fit_generator(train_generator,
 # unfreeze the top layers of ResNet50 and train the model again
 CNN_ResNet.trainable = True
 
-train_layers = ['block4_conv1','block4_conv2','block4_conv3','block5_conv1','block5_conv2','block5_conv3']
+# train_layers = ['res4a_branch2a', 'bn4a_branch2a','res4a_branch2b', 'bn4a_branch2b', 
+#                 'res4a_branch2c', 'res4a_branch1', 'bn4a_branch2c', 'bn4a_branch1', 
+#                 'res4b_branch2a', 'bn4b_branch2a', 'res4b_branch2b', 'bn4b_branch2b',
+#                 'res4b_branch2c', 'bn4b_branch2c', 'res4c_branch2a', 'bn4c_branch2a',
+#                 'res4c_branch2b', 'bn4c_branch2b', 'res4c_branch2c', 'bn4c_branch2c',
+#                 'res4d_branch2a', 'bn4d_branch2a', 'res4d_branch2b', 'bn4d_branch2b',
+#                 'res4d_branch2c', 'bn4d_branch2c', 'res4e_branch2a', 'bn4e_branch2a',
+#                 'res4e_branch2b', 'bn4e_branch2b', 'res4e_branch2c', 'bn4e_branch2c',
+#                 'res4f_branch2a', 'bn4f_branch2a', 'res4f_branch2b', 'bn4f_branch2b',
+#                 'res4f_branch2c', 'bn4f_branch2c', 'res5a_branch2a', 'bn5a_branch2a',
+#                 'res5a_branch2b', 'bn5a_branch2b', 'res5a_branch2c', 'res5a_branch1',
+#                 'bn5a_branch2c', 'bn5a_branch1', 'res5b_branch2a', 'bn5b_branch2a',
+#                 'res5b_branch2b', 'bn5b_branch2b', 'res5b_branch2c', 'bn5b_branch2c',
+#                 'res5c_branch2a', 'bn5c_branch2a', 'res5c_branch2b', 'bn5c_branch2b',
+#                 'res5c_branch2c', 'bn5c_branch2c',]
+
+train_layers = ['res5a_branch2a', 'bn5a_branch2a',
+                'res5a_branch2b', 'bn5a_branch2b', 'res5a_branch2c', 'res5a_branch1',
+                'bn5a_branch2c', 'bn5a_branch1', 'res5b_branch2a', 'bn5b_branch2a',
+                'res5b_branch2b', 'bn5b_branch2b', 'res5b_branch2c', 'bn5b_branch2c',
+                'res5c_branch2a', 'bn5c_branch2a', 'res5c_branch2b', 'bn5c_branch2b',
+                'res5c_branch2c', 'bn5c_branch2c', ]
 for layer in CNN_ResNet.layers:
     if layer in train_layers:
         layer.trainable = True
     else:
         layer.trainable = False
 
+model.summary()
 model.compile(loss='categorical_crossentropy',
               optimizer=opt, metrics=['accuracy'])
 
