@@ -137,7 +137,7 @@ model.load_model(os.path.join(saved_path, model_name_aug))
 model.load_weights(os.path.join(saved_path, model_weights_data_aug))
 # unfreeze the top layers of ResNet50 and train the model again
 CNN_ResNet.trainable = True
-
+set_trainable = False
 # train_layers = ['res5a_branch2a', 'bn5a_branch2a',
 #                 'res5a_branch2b', 'bn5a_branch2b', 'res5a_branch2c', 'res5a_branch1',
 #                 'bn5a_branch2c', 'bn5a_branch1', 'res5b_branch2a', 'bn5b_branch2a',
