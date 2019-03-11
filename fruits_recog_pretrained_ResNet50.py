@@ -3,7 +3,7 @@ from keras import backend as K
 K.tensorflow_backend._get_available_gpus()
 
 from keras import layers
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 from keras import optimizers
 from keras.layers import MaxPooling2D, Conv2D
 from keras.layers import Activation, Dropout, regularizers, Flatten, Dense
@@ -49,7 +49,8 @@ try:
     os.mkdir(saved_path)
 except:
     pass
-    
+
+# define filenames for saving the model
 model_name_aug = 'CNN_pretrained_ResNet50_aug.h5'
 model_weights_data_aug = 'CNN_pretrained_ResNet50_aug_weights.h5'
 model_name = 'CNN_pretrained_ResNet50.h5'
@@ -135,19 +136,19 @@ else:
 # load the model
 fine_model = load_model(os.path.join(saved_path, model_name_aug))
 fine_model.load_weights(os.path.join(saved_path, model_weights_data_aug))
+
 # unfreeze the top layers of ResNet50 and train the model again
 CNN_ResNet.trainable = True
 set_trainable = False
-# train_layers = ['res5a_branch2a', 'bn5a_branch2a',
-#                 'res5a_branch2b', 'bn5a_branch2b', 'res5a_branch2c', 'res5a_branch1',
-#                 'bn5a_branch2c', 'bn5a_branch1', 'res5b_branch2a', 'bn5b_branch2a',
-#                 'res5b_branch2b', 'bn5b_branch2b', 'res5b_branch2c', 'bn5b_branch2c',
-#                 'res5c_branch2a', 'bn5c_branch2a', 'res5c_branch2b', 'bn5c_branch2b',
-#                 'res5c_branch2c', 'bn5c_branch2c', ]
+train_layers = ['res5a_branch2a', 'bn5a_branch2a',
+                'res5a_branch2b', 'bn5a_branch2b', 'res5a_branch2c', 'res5a_branch1',
+                'bn5a_branch2c', 'bn5a_branch1', 'res5b_branch2a', 'bn5b_branch2a',
+                'res5b_branch2b', 'bn5b_branch2b', 'res5b_branch2c', 'bn5b_branch2c',
+                'res5c_branch2a', 'bn5c_branch2a', 'res5c_branch2b', 'bn5c_branch2b',
+                'res5c_branch2c', 'bn5c_branch2c', ]
+
 for layer in CNN_ResNet.layers:
-    if layer.name == 'activation_530':
-        set_trainable = True
-    if set_trainable:
+    if layer.name in train_layers:
         layer.trainable = True
     else:
         layer.trainable = False
