@@ -34,14 +34,14 @@ start_t = timer()
 # test_dir = '/Users/bathuy/Downloads/fruits-360/Test'
 
 # GCP link
-# training_dir = '/home/nhaclap_phan/DeepLearning/fruits-360/Training'
-# validation_dir = '/home/nhaclap_phan/DeepLearning/fruits-360/Validation'
-# test_dir = '/home/nhaclap_phan/DeepLearning/fruits-360/Test'
+training_dir = '/home/nhaclap_phan/DeepLearning/fruits-360/Training'
+validation_dir = '/home/nhaclap_phan/DeepLearning/fruits-360/Validation'
+test_dir = '/home/nhaclap_phan/DeepLearning/fruits-360/Test'
 
 # AWS link
-training_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset/Training'
-validation_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset/Validation'
-test_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset/Test'
+# training_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset/Training'
+# validation_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset/Validation'
+# test_dir = '/home/ubuntu/DeepLearning/Fruit-Images-Dataset/Test'
 
 # define the parameters
 saved_path = os.path.join(os.getcwd(), 'saved_models')
@@ -99,9 +99,9 @@ else:
 test_datagen = ImageDataGenerator(rescale=1./255)
 
 
-batch_size = 128
+batch_size = 1024
 # train the model
-num_epochs = 1
+num_epochs = 50
 
 # define data generator for training set and validation set
 print("Training set:")
@@ -134,52 +134,52 @@ else:
     model.save_weights(os.path.join(saved_path, model_weights))
 
 # load the model
-fine_model = load_model(os.path.join(saved_path, model_name_aug))
-fine_model.load_weights(os.path.join(saved_path, model_weights_data_aug))
+# fine_model = load_model(os.path.join(saved_path, model_name_aug))
+# fine_model.load_weights(os.path.join(saved_path, model_weights_data_aug))
 
-# unfreeze the top layers of ResNet50 and train the model again
-CNN_ResNet.trainable = True
-set_trainable = False
-train_layers = ['res5a_branch2a', 'bn5a_branch2a',
-                'res5a_branch2b', 'bn5a_branch2b', 'res5a_branch2c', 'res5a_branch1',
-                'bn5a_branch2c', 'bn5a_branch1', 'res5b_branch2a', 'bn5b_branch2a',
-                'res5b_branch2b', 'bn5b_branch2b', 'res5b_branch2c', 'bn5b_branch2c',
-                'res5c_branch2a', 'bn5c_branch2a', 'res5c_branch2b', 'bn5c_branch2b',
-                'res5c_branch2c', 'bn5c_branch2c', ]
+# # unfreeze the top layers of ResNet50 and train the model again
+# CNN_ResNet.trainable = True
+# set_trainable = False
+# train_layers = ['res5a_branch2a', 'bn5a_branch2a',
+#                 'res5a_branch2b', 'bn5a_branch2b', 'res5a_branch2c', 'res5a_branch1',
+#                 'bn5a_branch2c', 'bn5a_branch1', 'res5b_branch2a', 'bn5b_branch2a',
+#                 'res5b_branch2b', 'bn5b_branch2b', 'res5b_branch2c', 'bn5b_branch2c',
+#                 'res5c_branch2a', 'bn5c_branch2a', 'res5c_branch2b', 'bn5c_branch2b',
+#                 'res5c_branch2c', 'bn5c_branch2c', ]
 
-for layer in CNN_ResNet.layers:
-    if layer.name in train_layers:
-        layer.trainable = True
-    else:
-        layer.trainable = False
+# for layer in CNN_ResNet.layers:
+#     if layer.name in train_layers:
+#         layer.trainable = True
+#     else:
+#         layer.trainable = False
 
-fine_model.summary()
-fine_model.compile(loss='categorical_crossentropy',
-              optimizer=opt, metrics=['accuracy'])
+# fine_model.summary()
+# fine_model.compile(loss='categorical_crossentropy',
+#               optimizer=opt, metrics=['accuracy'])
 
-history = fine_model.fit_generator(train_generator,
-                              steps_per_epoch=48905//batch_size, epochs=num_epochs,
-                              callbacks=callbacks_list,
-                              validation_data=validation_generator,
-                              validation_steps=8205//batch_size)
+# history = fine_model.fit_generator(train_generator,
+#                               steps_per_epoch=48905//batch_size, epochs=num_epochs,
+#                               callbacks=callbacks_list,
+#                               validation_data=validation_generator,
+#                               validation_steps=8205//batch_size)
 #--------------------------------------------------------------------------------------
 # save the model
-if data_augmentation:
-    fine_model.save(os.path.join(saved_path, fine_model_name_aug))
-    fine_model.save_weights(os.path.join(
-        saved_path, fine_model_weights_data_aug))
-else:
-    fine_model.save(os.path.join(saved_path, fine_model_name))
-    fine_model.save_weights(os.path.join(saved_path, fine_model_weights))
+# if data_augmentation:
+#     fine_model.save(os.path.join(saved_path, fine_model_name_aug))
+#     fine_model.save_weights(os.path.join(
+#         saved_path, fine_model_weights_data_aug))
+# else:
+#     fine_model.save(os.path.join(saved_path, fine_model_name))
+#     fine_model.save_weights(os.path.join(saved_path, fine_model_weights))
 
 # --------display history--------
 # list all data in history
 print(history.history.keys())
 
-test_loss, test_acc = fine_model.evaluate_generator(
+test_loss, test_acc = model.evaluate_generator(
     test_generator, steps=8216//batch_size, verbose=1)
-print('Test accuracy = {:.4f}'.format(test_acc))
-print('Test loss = {:.4f}'.format(test_loss))
+print('Test accuracy = {:.6f}'.format(test_acc))
+print('Test loss = {:.6f}'.format(test_loss))
 
 # summarize history for accuracy
 acc = history.history['acc']
@@ -194,7 +194,7 @@ plt.plot(epochs, val_acc)
 plt.title('Training and validation accuracy')
 plt.ylabel('Accuracy')
 plt.xlabel('Epochs')
-plt.legend(['train', 'test'], loc='upper left')
+plt.legend(['train', 'test'], loc='lower right')
 plt.savefig(os.path.join(saved_path, 'train_test_accuracy_ResNet50.png'))
 plt.clf()  # clear figure
 
@@ -203,7 +203,7 @@ plt.plot(epochs, val_loss)
 plt.title(('Training and validation loss'))
 plt.ylabel('Loss')
 plt.xlabel('Epochs')
-plt.legend(['train', 'test'], loc='upper left')
+plt.legend(['train', 'test'], loc='upper rigth')
 plt.savefig(os.path.join(saved_path, 'train_test_loss_ResNet50.png'))
 plt.clf()
 
