@@ -20,6 +20,9 @@ import matplotlib.pyplot as plt
 from timeit import default_timer as timer
 import numpy as np 
 
+
+K.set_learning_phase(1)
+
 CNN_ResNet = ResNet50(weights='imagenet', include_top=False,
                       input_shape=(100, 100, 3))
 
